@@ -29,31 +29,38 @@ Until i = arrayLength:
 
 int main (void)
 {
-	double SinHertz = 22000, distanceFromPinger = 1, pulseTime = 1.3e-3, timeBetweenPulses = 2;
-	int arrayLength = 30000;
+	double SinHertz = 22000, distanceFromPinger = 10.5, pulseTime = 0.0013, timeBetweenPulses = 2;
+	int arrayLength = 70000;
+        
+        double c[arrayLength];
 	
 	int i = 0;
 	int n = 0;
+        
+        FILE* OutputToMatLab = fopen( "MatLabOutput.csv", "w");
 	
 	double timeDelay = distanceFromPinger / SPEEDOFSOUNDINWATER * SAMPLINGFREQUENCY;
 	
 	for ( ; i < arrayLength; i++)
 	{
-		double masterShift = timeDelay + n*timeBetweenPulses*SAMPLEINGFREQUENCY;
-		if (i < masterShift)
+		double masterShift = (timeDelay + n*timeBetweenPulses*SAMPLINGFREQUENCY);
+		if (i < (int)masterShift)
 		{
 			c[i] = 0.0;
 		}
 		else
 		{
-			for( ; (i - mastershift) < (pulseTime*SAMPLINGFREQUENCY) ; )
+			for( ; (i - (int)masterShift) <= (int)(pulseTime*SAMPLINGFREQUENCY) ; i++)
 			{
-				c[i] = ( sin(2*pi*SinHertz(i - masterShift)) / (distance * distance) );
+				c[i] = ( sin(2*pi*SinHertz*(i - masterShift)) / (distanceFromPinger * distanceFromPinger) );
+                                //printf("%d) %g ", i, c[i]);
+                                fprintf(OutputToMatLab, "%d, %g\n", i, c[i]);
 			}
 			n++;
 		}
 		
-		printf("%d) %g", i, c[i]);
+		//printf("%d) %g ", i, c[i]);
+                fprintf(OutputToMatLab, "%d, %g\n", i, c[i]);
 	}
 	
 	return 0;
