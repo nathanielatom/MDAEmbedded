@@ -5,10 +5,12 @@
 #define SAMPLINGFREQUENCY 1000000
 #define SPEEDOFSOUNDINWATER 1500
 #define pi 3.141592
-#define MAX_OUTPUT_LEN 26
+#define MAX_OUTPUT_LEN 27
 #define ORG_STR_LEN 11
 #define MAX_DISTANCE_LEN 11
 #define FILE_EXT_LEN 4
+#define CHAR_LEN 1
+#define LEN_TRY 3
 
 /*
 
@@ -34,20 +36,23 @@ Until i = arrayLength:
 
 int main (void)
 {
-	double SinHertz = 22000, distanceFromPinger = 10.1414, pulseTime = 0.0013, timeBetweenPulses = 2;
-	int arrayLength = 40000;
+	double SinHertz = 22000, distanceFromPinger = 10.1, pulseTime = 0.0013, timeBetweenPulses = 2;
+	int arrayLength = 7383;
         
         double c[arrayLength];
 	
 	int i = 0;
-	int n = 0;
+        int n = 0;
         
         char title[MAX_OUTPUT_LEN];
         char distance[MAX_DISTANCE_LEN];
+        char try[CHAR_LEN] = "2";
         
         strncpy(title, "MatLabInput", ORG_STR_LEN);
         snprintf(distance, MAX_DISTANCE_LEN,  "%g", distanceFromPinger);
         strncat(title, distance, MAX_DISTANCE_LEN);
+        strncat(title, "Try", LEN_TRY);
+        strncat(title, try, CHAR_LEN);
         strncat(title, ".csv", FILE_EXT_LEN);
         title[MAX_OUTPUT_LEN] = '/0';
         
@@ -62,16 +67,15 @@ int main (void)
 		{
 			c[i] = 0.0;
 		}
-		else
+		else if((i - (int)masterShift) <= (int)(pulseTime*SAMPLINGFREQUENCY))
 		{
-			for( ; (i - (int)masterShift) <= (int)(pulseTime*SAMPLINGFREQUENCY) ; i++)
-			{
-				c[i] = ( sin(2*pi*SinHertz*(i - (int)masterShift)) / (distanceFromPinger * distanceFromPinger) );
-                                //printf("%d) %g ", i, c[i]);
-                                fprintf(OutputToMatLab, "%d, %g\n", i, c[i]);
-			}
-			n++;
+                        c[i] = ( sin(2*pi*SinHertz*(i - (int)masterShift)) / (distanceFromPinger * distanceFromPinger) );
 		}
+                else
+                {
+                    n++;
+                    i--;
+                }
 		
 		//printf("%d) %g ", i, c[i]);
                 fprintf(OutputToMatLab, "%d, %g\n", i, c[i]);
