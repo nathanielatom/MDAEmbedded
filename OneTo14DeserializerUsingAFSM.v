@@ -58,7 +58,7 @@ module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, y_Q, Y_D, ready, dat
 					Y_D = DONE;
 				else
 					Y_D = INPUT;
-			C: if (Ack)
+			DONE: if (Ack)
 					Y_D = START;
 				else
 					Y_D = DONE;
