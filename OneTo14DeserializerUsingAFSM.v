@@ -50,11 +50,11 @@ module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, y_Q, Y_D, ready, dat
 	always @(ss, Ack, y_Q)
 	begin: state_table
 		case (y_Q)
-			START: if (negedge ss)
+			START: if (!ss)
 					Y_D = INPUT;
 				else
 					Y_D = START;
-			INPUT: if (posedge ss)
+			INPUT: if (ss)
 					Y_D = DONE;
 				else
 					Y_D = INPUT;
@@ -80,7 +80,7 @@ module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, y_Q, Y_D, ready, dat
 											.q(data_out)
 											);
 								
-	always @(posedge clock)
+	always @(posedge clock or negedge resetn)
 	begin: state_FFs
 		if (resetn == 0)
 			y_Q <= START;
