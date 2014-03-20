@@ -12,7 +12,7 @@ module D_FF_with_Enable(clk, resetn, enable, d, q);
 	input d;
 	output reg q;
 	
-	always @(posedge clk)
+	always @(posedge clk or negedge resetn)
 	begin
 		if (!resetn)
 		begin

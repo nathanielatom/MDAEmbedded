@@ -12,7 +12,7 @@ module ShiftRegisterWEnableFourteen(clk, resetn, enable, d, q);
 	input resetn;
 	input enable;
 	input d;
-	output reg [13:0]q;
+	output [13:0] q;
 	
 	D_FF_with_Enable Zero(clk, resetn, enable, d, q[0]);
 	D_FF_with_Enable One(clk, resetn, enable, q[0], q[1]);
