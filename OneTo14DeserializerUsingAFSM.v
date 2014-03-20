@@ -8,7 +8,7 @@ However, this will reduce the speed of the data's release by a few clock cycles.
 
 */
 
-module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, y_Q, Y_D, ready, data_in, data_out);
+module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, ready, data_in, data_out);
 	//	Define the different I/Os	//
 	
 	//	General Inputs	//
@@ -25,8 +25,8 @@ module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, y_Q, Y_D, ready, dat
 	output ready;
 	
 	//	Debugging I/O	//
-	output reg [1:0] y_Q;
-	output reg [1:0] Y_D;
+//	output reg [1:0] y_Q;
+//	output reg [1:0] Y_D;
 	
 	/*
 	FSM Parts
@@ -44,7 +44,7 @@ module OneTo14DeserializerUsingAFSM(clock, resetn, ss, Ack, y_Q, Y_D, ready, dat
 		-----------------------------------------
 	*/
 	
-	//reg [1:0] y_Q, Y_D;
+	reg [1:0] y_Q, Y_D;
 	parameter START = 2'b00, INPUT = 2'b01, DONE = 2'b10;
 	
 	always @(ss, Ack, y_Q)
