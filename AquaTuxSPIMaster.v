@@ -55,7 +55,9 @@ module AquaTuxSPIMaster(Clk, resetn, ss, CPOL, CPHA, SCLK, MOSI, MISOA, MISOB, S
 	
 	Master Registers
 	
-	The two registers run on opposite clock edges.
+	The AD7264 will read data on the negedge, thus we have to send data on the posedge.
+	The AD7264 will send data on the negedge, thus we have to read the data on the posedge.
+	As such, all of the registers are running on the same edge.
 	*/
 	
 	//Transmitting Register
