@@ -74,33 +74,33 @@ module AquaTuxSPIMaster(Clk, resetn, ss, startSending, CPOL, CPHA, SCLK, MOSI, M
 	*/
 	
 	//Transmitting Register
-	SPIRegisterAsync TXRM(
-							.SCLK(SCLK), 
-							.resetn(resetn), 
-							.SS(masterSS), 
-							.RS(RS), 
-							.in(DIM), 
-							.out(TX)
-						 );
+	SPIRegister TXRM(
+						.SCLK(SCLK), 
+						.resetn(resetn), 
+						.SS(masterSS), 
+						.RS(RS), 
+						.in(DIM), 
+						.out(TX)
+					);
 	
 	//Recieveing Registers
-	SPIRegisterAsync RXRMA(
-							.SCLK(SCLK), 
-							.resetn(resetn), 
-							.SS(masterSS), 
-							.RS(RS), 
-							.in(MISOA), 
-							.out(DOMA)
-						  );
+	SPIRegister RXRMA(
+						.SCLK(SCLK), 
+						.resetn(resetn), 
+						.SS(masterSS), 
+						.RS(RS), 
+						.in(MISOA), 
+						.out(DOMA)
+					  );
 						  
-	SPIRegisterAsync RXRMB(
-							.SCLK(SCLK), 
-							.resetn(resetn), 
-							.SS(masterSS), 
-							.RS(RS), 
-							.in(MISOB), 
-							.out(DOMB)
-						  );
+	SPIRegister RXRMB(
+						.SCLK(SCLK), 
+						.resetn(resetn), 
+						.SS(masterSS), 
+						.RS(RS), 
+						.in(MISOB), 
+						.out(DOMB)
+					  );
 						  
 	/*
 	
