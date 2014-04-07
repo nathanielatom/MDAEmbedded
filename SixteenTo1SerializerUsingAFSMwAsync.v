@@ -24,7 +24,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 	input start;
 	input ss;
 	output data_sent;
-	output counter_done;
+	output counter_start;
 	
 	//	Debugging I/O	//
 	output reg [1:0] y_Q;
@@ -32,7 +32,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 	output [15:0] allOfDataOut;
 	
 	//	Additional Wires	//
-	wire muxSel, counter_start;
+	wire muxSel, counter_done;
 	wire [3:0] counter_bit;
 	
 	/*
@@ -95,7 +95,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 		//	Needed assignments	//
 	assign data_sent = ~y_Q[1] & ~y_Q[0];
 	assign muxSel = ~y_Q[1] & y_Q[0];
-	assign counter_start = y_Q[1] & ~y_Q[0]
+	assign counter_start = y_Q[1] & y_Q[0]
 	assign data_out = allOfDataOut[0];
 	
 	assign counter_done = counter_bit[3] & counter_bit[2] & counter_bit[1] & counter_bit[0];
