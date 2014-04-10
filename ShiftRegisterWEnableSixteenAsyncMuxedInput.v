@@ -13,8 +13,9 @@ module ShiftRegisterWEnableSixteenAsyncMuxedInput(clk, resetn, enable, select, d
 	input	clk;
 	input	resetn;
 	input	enable;
-	input	[15:0]d;
-	output	[15:0]q;
+	input select;
+	input	[15:0] d;
+	output [15:0] q;
 	
 	wire	[15:1]muxOut;
 	

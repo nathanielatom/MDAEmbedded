@@ -11,7 +11,7 @@ module T_FF_with_Enable_Async(clk, resetn, enable, q);
 	input enable;
 	output reg q;
 	
-	always @(posedge clk and negedge resetn)
+	always @(posedge clk or negedge resetn)
 	begin
 		if (!resetn)
 		begin

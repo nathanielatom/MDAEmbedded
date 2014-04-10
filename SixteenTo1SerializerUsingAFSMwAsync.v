@@ -8,7 +8,7 @@ However, this will reduce the speed of the data's release by a few clock cycles.
 This serializer has asyncoronous negative reset.
 */
 
-module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input, data_sent, counter_done, data_output, y_Q, Y_D, allOfDataOut);
+module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input, data_sent, counter_start, muxSel, data_output, y_Q, Y_D, allOfDataOut);
 
 	//	I/O Definations	//
 	
@@ -29,6 +29,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 	//	Debugging I/O	//
 	output reg [1:0] y_Q;
 	output reg [1:0] Y_D;
+	output muxSel;
 	output [15:0] allOfDataOut;
 	
 	//	Additional Wires	//
@@ -65,7 +66,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 		case (y_Q)
 			START: 
 				if (start)
-					Y_D = INPUT;
+					Y_D = LOAD;
 				else
 					Y_D = START;
 			LOAD: 
@@ -95,16 +96,16 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 		//	Needed assignments	//
 	assign data_sent = ~y_Q[1] & ~y_Q[0];
 	assign muxSel = ~y_Q[1] & y_Q[0];
-	assign counter_start = y_Q[1] & y_Q[0]
-	assign data_out = allOfDataOut[0];
+	assign counter_start = y_Q[1] & y_Q[0];
+	assign data_out = allOfDataOut[15];
 	
 	assign counter_done = counter_bit[3] & counter_bit[2] & counter_bit[1] & counter_bit[0];
 	
 	//	The Counter	//
 	FourBitCounterAsync TheClockKing (
-										.clk(clock)
-										.resetn(resetn)
-										.enable(counter_start)
+										.clk(clock),
+										.resetn(resetn),
+										.enable(counter_start),
 										.q(counter_bit)
 									);
 	
@@ -112,7 +113,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 	ShiftRegisterWEnableSixteenAsyncMuxedInput CrashOnTheGardner(
 																	.clk(clock), 
 																	.resetn(resetn), 
-																	.enable(enable), 
+																	.enable(y_Q[0]), 
 																	.select(muxSel), 
 																	.d(data_in), 
 																	.q(allOfDataOut) 
