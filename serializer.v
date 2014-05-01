@@ -11,7 +11,7 @@ module serializer(SW, KEY, LEDR, LEDG, HEX3, HEX2, HEX1, HEX0);
 	
 	wire [15:0] registeel;
 	wire [15:0] regigrab;
-	wire [1:0] y_Q, Y_D;
+	
 	assign regigrab[15] = SW[5];
 	assign regigrab[14] = SW[5];
 	assign regigrab[13] = SW[5];
@@ -28,22 +28,26 @@ module serializer(SW, KEY, LEDR, LEDG, HEX3, HEX2, HEX1, HEX0);
 	assign regigrab[2] = SW[2];
 	assign regigrab[1] = SW[2];
 	assign regigrab[0] = SW[2];
-	assign LEDG[3:2] = y_Q;
-	assign LEDG[5:4] = Y_D;
+	
 	SevenSegmentDisplayDecoder H3(HEX3, registeel[15:12]);
 	SevenSegmentDisplayDecoder H2(HEX2, registeel[11:8]);
 	SevenSegmentDisplayDecoder H1(HEX1, registeel[7:4]);
 	SevenSegmentDisplayDecoder H0(HEX0, registeel[3:0]);
+	
 	SixteenTo1SerializerUsingAFSMwAsync Pileup_on_the_don_valley(.clock(KEY[0]), 
-																					.resetn(KEY[1]), 
-																					.start(SW[0]), 
-																					.ss(SW[1]), 
+																					.resetn(KEY[1]),
 																					.data_input(regigrab), 
-																					.data_sent(LEDG[0]), 
-																					.counter_start(LEDG[1]), 
-																					.muxSel(LEDG[6]),
-																					.data_output(LEDR[1]), 
-																					.y_Q(y_Q), 
-																					.Y_D(Y_D), 
-																					.allOfDataOut(registeel));
+																					.data_output(LEDR[9]),
+																					.data_sent(LEDG[4]), 
+																					.start(SW[0]), 
+																					.data_loaded(LEDG[5]),
+																					.ss(SW[1]), 
+																					.counter_done(LEDG[6]), 
+																					.y_Q(LEDG[1:0]), 
+																					.Y_D(LEDG[3:2]),
+																					.allOfDataOut(registeel),
+																					.counter_start(LEDR[0]),
+																					.muxSel(LEDG[7]),
+																					.counter_bit(LEDR[4:1])
+																					);
 endmodule

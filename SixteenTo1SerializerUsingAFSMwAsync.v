@@ -8,7 +8,7 @@ However, this will reduce the speed of the data's release by a few clock cycles.
 This serializer has asyncoronous negative reset.
 */
 
-module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_output, data_sent, start, data_loaded, ss, counter_done, y_Q, Y_D, allOfDataOut, counter_start, muxSel);
+module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_output, data_sent, start, data_loaded, ss, counter_done, y_Q, Y_D, allOfDataOut, counter_start, muxSel, counter_bit);
 
 	//	I/O Definations	//
 	
@@ -35,13 +35,11 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_outpu
 	output [15:0] allOfDataOut;
 	output muxSel;
 	output counter_start;
-	
-	//	Additional Wires and Regs	//
-	wire [3:0] counter_bit;
+	output [3:0]counter_bit;
 	
 	//	FSM Wire Assignments	//
 	assign counter_done = counter_bit[3] & counter_bit[2] & counter_bit[1] & counter_bit[0];
-	assign data_loaded = (allOfDataOut == data) ? 1 : 0;
+	assign data_loaded = (allOfDataOut == data_input) ? 1 : 0;
 	
 	/*
 		FSM States
@@ -91,7 +89,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_outpu
 					Y_D = START;
 				else
 					Y_D = SEND;
-			default: Y_D = 3'bxxx;
+			default: Y_D = 2'bxx;
 		endcase
 	end // state_table
 		
@@ -109,9 +107,9 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_outpu
 	
 	//	The Counter	//
 	FourBitCounterAsync TheClockKing (
-										.clk(clock)
-										.resetn(resetn)
-										.enable(counter_start)
+										.clk(clock),
+										.resetn(resetn),
+										.enable(counter_start),
 										.q(counter_bit)
 									);
 	
@@ -121,12 +119,12 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_outpu
 																	.resetn(resetn), 
 																	.enable(y_Q[0]), 
 																	.select(muxSel), 
-																	.d(data_in), 
+																	.d(data_input), 
 																	.q(allOfDataOut) 
 																);
 	
 	//	Output Assignments	//
 	assign data_sent = ~y_Q[1] & ~y_Q[0];
-	assign data_out = allOfDataOut[15];
+	assign data_output = allOfDataOut[15];
 	
 endmodule
