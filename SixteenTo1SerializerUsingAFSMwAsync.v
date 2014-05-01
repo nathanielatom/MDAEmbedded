@@ -1,5 +1,5 @@
 /*
-Anthony De Caria - March 26, 2014
+Anthony De Caria - March 26, 2014 (Finished May 
 
 This code implemenets a 16 to 1 bit serializer.
 The data in the serializer is stored into and released using a muxed shift register.
@@ -8,7 +8,7 @@ However, this will reduce the speed of the data's release by a few clock cycles.
 This serializer has asyncoronous negative reset.
 */
 
-module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input, data_sent, counter_start, muxSel, data_output, y_Q, Y_D, allOfDataOut);
+module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, data_input, data_output, data_sent, start, data_loaded, ss, counter_done, y_Q, Y_D, allOfDataOut, counter_start, muxSel);
 
 	//	I/O Definations	//
 	
@@ -20,21 +20,28 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 	input [15:0]data_input;
 	output data_output;
 	
+	//	Handshaking I/Os	//
+	output data_sent;
+	
 	//	State changing I/Os	//
 	input start;
+	output reg data_loaded;
 	input ss;
-	output data_sent;
-	output counter_start;
+	output reg counter_done;
 	
-	//	Debugging I/O	//
+	//	Debugging I/Os	//
 	output reg [1:0] y_Q;
 	output reg [1:0] Y_D;
-	output muxSel;
 	output [15:0] allOfDataOut;
+	output muxSel;
+	output counter_start;
 	
-	//	Additional Wires	//
-	wire muxSel, counter_done;
+	//	Additional Wires and Regs	//
 	wire [3:0] counter_bit;
+	
+	//	FSM Wire Assignments	//
+	assign counter_done = counter_bit[3] & counter_bit[2] & counter_bit[1] & counter_bit[0];
+	assign data_loaded = (allOfDataOut == data) ? 1 : 0;
 	
 	/*
 		FSM States
@@ -45,7 +52,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 		v									|
 		Load								|
 		|									|
-		|									|
+		|	data_loaded						|
 		v									|
 		Wait								|
 		|									|
@@ -61,7 +68,7 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 	//	The FSM	//
 	parameter START = 2'b00, LOAD = 2'b01, WAIT = 2'b10, SEND = 2'b11;
 	
-	always @(start, ss, counter_done, y_Q)
+	always @(start, ss, counter_done, data_loaded, y_Q)
 	begin: state_table
 		case (y_Q)
 			START: 
@@ -69,8 +76,11 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 					Y_D = LOAD;
 				else
 					Y_D = START;
-			LOAD: 
-				Y_D = WAIT;
+			LOAD:
+				if (data_loaded)
+					Y_D = WAIT;
+				else
+					Y_D = LOAD;
 			WAIT: 
 				if (!ss)
 					Y_D = SEND;
@@ -93,19 +103,15 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 			y_Q <= Y_D;
 	end // state_FFs
 	
-		//	Needed assignments	//
-	assign data_sent = ~y_Q[1] & ~y_Q[0];
+	//	Shift Register Assignments	//
 	assign muxSel = ~y_Q[1] & y_Q[0];
 	assign counter_start = y_Q[1] & y_Q[0];
-	assign data_out = allOfDataOut[15];
-	
-	assign counter_done = counter_bit[3] & counter_bit[2] & counter_bit[1] & counter_bit[0];
 	
 	//	The Counter	//
 	FourBitCounterAsync TheClockKing (
-										.clk(clock),
-										.resetn(resetn),
-										.enable(counter_start),
+										.clk(clock)
+										.resetn(resetn)
+										.enable(counter_start)
 										.q(counter_bit)
 									);
 	
@@ -118,5 +124,9 @@ module SixteenTo1SerializerUsingAFSMwAsync(clock, resetn, start, ss, data_input,
 																	.d(data_in), 
 																	.q(allOfDataOut) 
 																);
+	
+	//	Output Assignments	//
+	assign data_sent = ~y_Q[1] & ~y_Q[0];
+	assign data_out = allOfDataOut[15];
 	
 endmodule
